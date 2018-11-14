@@ -66,8 +66,7 @@ classdef Allegretto
             
             if exist(loadname, 'file')
               load(loadname);
-            end
-            
+            else            
                 initialize(obj);
                 readPDF(obj, filename);
                 setProps(obj, 0.025, 5, 0.1);                
@@ -76,6 +75,7 @@ classdef Allegretto
                 obj = calcEdge(obj);
                 obj = calcTrans(obj);             
                 save(savename);
+            end
   
         end
         
