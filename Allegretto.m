@@ -55,6 +55,7 @@ classdef Allegretto
         numOfColors;
         z;
         grid;
+        
     end
     
     methods
@@ -117,8 +118,8 @@ classdef Allegretto
         end
         
         function obj = run(obj)
+        
            scaling(obj);
-          
            sumGray = sum(obj.image(:) == obj.grayPix); 
            
            while ne(sumGray(1), 0)
@@ -141,6 +142,7 @@ classdef Allegretto
 
             DAx = obj.correctionVal(1) + cos((ax-obj.correctionVal(3))*pi/180)^2*obj.correctionVal(2);
             DAx = round(DAx*4)/4;
+            
         end
         
         function obj = zPreFunc(obj)
@@ -149,17 +151,15 @@ classdef Allegretto
             
             for i = 1 : length(obj.x)
                 for j = 1 : length(obj.y)
-                    
                     if obj.x(i)^2 + obj.y(j)^2 <= (obj.ablationZone/2)^2
                         tempZ(i,j) = real(obj.R2.*sqrt(1 - (obj.x(i).^2 ./ obj.R1.^2 +obj. y(j).^2 ./ obj.R2.^2)));
                     else
                         tempZ(i,j) = NaN;
                     end
-                    
                 end
             end
+            obj.zPre = tempZ;    
             
-            obj.zPre = tempZ;              
          end
 
         function obj = zPostFunc(obj)
@@ -172,17 +172,15 @@ classdef Allegretto
         
             for i = 1 : length(obj.x)
                 for j = 1 : length(obj.y)
-                    
                     if obj.x(i)^2 + obj.y(j)^2 <= (R/2)^2
                         tempZ(i,j) = real(obj.R2Post.*sqrt(1 - (obj.x(i).^2 ./ obj.R1Post.^2 + obj.y(j).^2 ./ obj.R2Post.^2))) + diff - obj.centralDepth*0.001;
                     else
                         tempZ(i,j) = NaN;
                     end
-                    
                 end
             end
+            obj.zPost = tempZ;    
             
-            obj.zPost = tempZ;            
         end
         
         function nearest = getNEdge(obj,Xp,Yp)
@@ -229,9 +227,7 @@ classdef Allegretto
             tempTrans = zeros(length(obj.x),length(obj.y));
             
             for i = 1 : length(obj.x)
-                
                 for j = 1 : length(obj.y)
-                    
                     if (obj.x(i)^2 + obj.y(j)^2 >= (obj.opticalZone/2)^2 && obj.x(i)^2 + obj.y(j)^2 <= ((RR)/2)^2)
                         if  not(isnan(getNEdge(obj,obj.x(i),obj.y(j)))) && getNEdge(obj,obj.x(i),obj.y(j)) >= 0.02
                         tempTrans(i,j) = getNEdge(obj,obj.x(i),obj.y(j)) * (1 + cos(pi/2*((sqrt(obj.x(i)^2 + obj.y(j)^2) - 0.5*obj.opticalZone)/(0.5*RR - 0.5*obj.opticalZone) + 1)));
@@ -240,7 +236,6 @@ classdef Allegretto
                     else
                         tempTrans(i,j) = NaN;
                     end
-                    
                 end 
             end 
             
@@ -353,11 +348,9 @@ classdef Allegretto
 
              for i = 1 : obj.initImgSize   
                 for j = 1 : obj.initImgSize
-                    
                     obj = changeColor(obj, 255, 255, 255, i, j);
                     obj = changeColor(obj, 0, 0, 0, i, j);
                     obj = changeColor(obj, 160, 160, 160, i, j);
-
                 end
             end      
         end
@@ -383,11 +376,9 @@ classdef Allegretto
         function obj = changeColor(obj, red, green, blue, i, j )
 
             if isequal(red, green, blue, 255)
-                
                 if isequal(obj.image(i, j, 1), red) && isequal(obj.image(i,j,2),green) && isequal(obj.image(i,j,3),blue)
                     obj.image(i, j, :) = obj.pixelTab(25,1,:);
                 end
-                
             elseif isequal(obj.image(i, j, 1), red) && isequal(obj.image(i,j,2),green) && isequal(obj.image(i,j,3),blue)
                 
                 y = i;
@@ -500,7 +491,5 @@ classdef Allegretto
             zlabel('ablation depth[um]','FontSize', 20);
             
         end
-        
     end 
-    
 end
